@@ -6,12 +6,17 @@ class NetworkHelper {
   final Uri url;
 
   Future<dynamic> getData() async {
-    http.Response response = await http.get(url);
+    try {
+      http.Response response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      print(response.statusCode);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+            'HTTP request failed with status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch data: $e');
     }
   }
 }
