@@ -133,6 +133,8 @@ const String themoviedbApi = 'your_api_token_here';
 #### Snapshots
 ![Intro Screen](image.png)
 ![finder](image-1.png)
+![Movie Tags](image-2.png)**`TODO` Migration from android to web seamlessly**
+![web finder](image-3.png)
 
 
 #### Known Bugs`(TODO)`

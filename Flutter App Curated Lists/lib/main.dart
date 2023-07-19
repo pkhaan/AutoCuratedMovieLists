@@ -13,32 +13,6 @@ import 'screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Sizer(
-//       builder: (context, orientation, deviceType) {
-//         return MaterialApp(
-//           debugShowCheckedModeBanner: false,
-//           title: 'Auto Curated Movie Lists',
-//           theme: ThemeData.dark().copyWith(
-//             platform: TargetPlatform.android,
-//             primaryColor: kPrimaryColor,
-//             scaffoldBackgroundColor: kPrimaryColor,
-//           ),
-//           home: HomeScreen(
-//             key: kHomeScreenKey,
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
-
 void main() {
   runApp(MyApp());
 }
