@@ -4,14 +4,19 @@ import os
 
 from dotenv import load_dotenv
 from matching import match
+from matching import match_two
 
 
 def main():
-    all_movies = match()
+    #all_movies = match()
+    all_movies = match_two()
+
+    load_dotenv()
+    api_access_token = os.getenv('TMDB_API_ACCESS_TOKEN')
 
     headers = {
         'accept': 'application/json',
-        'Authorization': 'Bearer ' + os.getenv('TMDB_API_ACCESS_TOKEN'),
+        'Authorization': 'Bearer ' + api_access_token
     }
 
     details = []
@@ -62,6 +67,7 @@ def main():
         title['genres'] = genre_list
 
     df = pd.DataFrame(details)
+    df.to_csv('final_movies.csv', index=False)
 
 
 if __name__ == '__main__':

@@ -13,7 +13,6 @@ from tspdt_scraping import scrape_tspdt
 # We will use recordlinkage to match the movies from the 5 lists. We use recordlinkage istead of a simple concat
 # because the titles in the 5 lists may not be exactly the same.
 def match():
-
     afi_list = scrape_afi()
     criterion_list = scrape_criterion()
     bfi_list = scrape_bfi()
@@ -65,3 +64,43 @@ def match():
 
     return merged_df
 
+
+def match_two():
+    afi_list = scrape_afi()
+    criterion_list = scrape_criterion()
+    bfi_list = scrape_bfi()
+    loc_list = scrape_loc()
+    tspdt_list = scrape_tspdt()
+
+    df1 = afi_list
+    df2 = loc_list
+
+    indexer = recordlinkage.Index()
+    indexer.full()
+    candidate_links = indexer.index(df1, df2)
+
+    c = recordlinkage.Compare()
+
+    c.string('title', 'title', method='jarowinkler', threshold=0.85, label='title')
+    c.exact('year', 'year', label='year')
+
+    features = c.compute(candidate_links, df1, df2)
+
+    potential_duplicates = features[features.sum(axis=1) > 1]
+
+    duplicates_df = pd.DataFrame(index=potential_duplicates.index.get_level_values(0), columns=['title', 'year'])
+
+    for idx in duplicates_df.index:
+        title = df1.loc[idx, 'title']
+        year = df1.loc[idx, 'year']
+        duplicates_df.loc[idx] = [title, year]
+
+    duplicates_df.drop_duplicates(inplace=True)
+
+    merged_lists = pd.merge(df1, df2, how='left', on=['title', 'year'])
+
+    for title in merged_lists['title']:
+        if title in duplicates_df['title'].values:
+            merged_lists = merged_lists[~merged_lists['title'].isin(duplicates_df['title'])]
+
+    return merged_lists
