@@ -53,6 +53,49 @@ We iteratively compare all pairs of lists to find movies appearing on both lists
 The output after this step is a sinlge DataFrame containing every movie appearing at least once in some list, without any duplicates. 
 
 
+## Using Jaccard Similarity
+We implement also the matching parameter using `fuzzy` word token ratio and jaccard similarity.
+$$d(i,j) = \frac {b+c}{a+b+c} \implies 1- sim(i,j)$$
+for given sets while the general rule for 2 sets is 
+$$J(A, B) = \frac {|A \cap B|}{|A \cup B|}$$
+
+```python
+import pandas as pd
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
+csv_file1 = 'ScrapedCSVs/top_100_movies.csv'
+csv_file2 = 'ScrapeLOC/movies.csv'
+csv_file3 = 'ScrapeRottenTomatoes/moviesRT.csv'
+
+# Read each CSV into separate DataFrames
+df1 = pd.read_csv(csv_file1)
+df2 = pd.read_csv(csv_file2)
+df3 = pd.read_csv(csv_file3)
+#....and many other .csvs
+
+# Function to find fuzzy matches using Jaccard similarity
+def fuzzy_match_jaccard(movie_title, titles_list):
+    return process.extractOne(movie_title, titles_list, scorer=fuzz.token_sort_ratio)[0]
+
+# Get a list of all movie titles in all three DataFrames
+all_movie_titles = df1['Title'].tolist() + df2['Title'].tolist() + df3['Title'].tolist()
+
+# Find fuzzy matches for each DataFrame
+df1['Matched_Title'] = df1['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
+df2['Matched_Title'] = df2['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
+df3['Matched_Title'] = df3['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
+
+# Concatenate the DataFrames based on fuzzy matches
+combined_df = pd.concat([df1, df2, df3], ignore_index=True)
+
+# Write the combined DataFrame to a new CSV file
+output_csv = 'combined_movies_jaccard.csv'
+combined_df.to_csv(output_csv, index=False)
+
+print(f"Jaccard similarity matching completed. The combined data is saved to {output_csv}.")
+```
+
 ## Flutter Application
 
 ### Operating Principle
@@ -87,10 +130,17 @@ const String themoviedbApi = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 ```dart
 const String themoviedbApi = 'your_api_token_here';
 ```
-
+#### Snapshots
+![Intro Screen](image.png)
+![finder](image-1.png)
 
 
 #### Known Bugs`(TODO)`
 - Android Emulator doesn't work due to `jvm` error
 - Web view needs to be fixed as the project renders mainly to android and iOS devices
 - Correct connection with our API and the predisposed API that **flutter** provided.
+
+
+### Collaborators
+- [Petros Chanas](https://github.com/pkhaan):cd:
+- [Nikolas Giannakopoulos](https://github.com/nickgiann):camera:
