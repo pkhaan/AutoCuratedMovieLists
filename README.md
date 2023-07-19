@@ -45,6 +45,13 @@ def scrape_movie_titles(url):
     movie_titles = [title.text for title in titles]
     return movie_titles
 ```
+## Data Matching
+For Data Matching we used Python's RecordLinkage library.
+We opted for RecordLinkage instead of a simple concatenation because the titles of the movies aren't always exactly the same across two lists. For example we have "The Godfather" in a list and "The Godfather trilogy" in another, but we only need to keep one.
+Record Linkage uses Levenshtein Distance to calculate the similarity between two strings.
+We iteratively compare all pairs of lists to find movies appearing on both lists. We check that both the titles are similar enough (based on a threshold) anf that the years (if available) are the same.
+The output after this step is a sinlge DataFrame containing every movie appearing at least once in some list, without any duplicates. 
+
 
 ## Flutter Application
 
