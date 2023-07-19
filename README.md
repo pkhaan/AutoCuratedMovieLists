@@ -1,17 +1,15 @@
 # :camera:Auto Curated Movie Lists 
-## In this project we will attempt to instegrate various movie sources and connect them to the **TMDB** api via a frontend web and mobile app using the **Flutter** framework :cd:
+## This projects aims to provide lists containing only *great* movies to users based only a gew filters and search parameters. :cd:
 
 ### Our Aim
-- Identify Movie Websites: Determine the websites that provide the movie titles. These websites should have a consistent structure and accessibility that allows for web scraping. Ensure that you comply with the websites' terms of service and usage policies.
+- Identify Movie Websites: We used websites with lists of "good movies". We chose lists of movies based not on user reviews or personal taste. Most lists come from the opinions of hundreds of film critics around the world and are.
  
-- Implement Web Scraping: Develop web scraping scripts or utilize web scraping libraries in a programming language like Python (e.g., Beautiful Soup, Scrapy) to extract movie titles from the identified websites. Retrieve the movie titles by navigating the website's HTML structure and capturing relevant elements.
+- Implement Web Scraping: We then scraped those websites using Python in order to extract the info we needed.
+
+- Match Data: After the web scraping process we are left with 5 lists. We want to match those lists and create a single one without duplicates or "bad" data.
  
-- Define API Integration: Identify a movie information API that provides the additional movie details you require. Ensure that the API offers the necessary endpoints and data fields to retrieve the desired movie information. Review the API documentation and obtain any required access credentials.
- 
-- Design API Requests: Define the API requests needed to retrieve movie information based on the extracted movie titles. Construct the appropriate API endpoints and include any required parameters or headers. Use the extracted movie titles as inputs in the API requests.
- 
-- Extract Movie Information from API: Implement the logic to send API requests with the extracted movie titles and retrieve the corresponding movie information in response. Parse and extract the required movie details from the API responses, such as synopsis, release date, genre, director, and other relevant information.
- 
+- Define TMDB API Integration and extract movie information: using TMDB's public API we want to get further information for each movie. Such information would be the release date, genres, language etc. We will use this informations to filter the movies based on the user search query.
+
 - Apply Filters and Parameters: Design and implement the filter and parameter functionality in your web app's user interface. Allow users to input their desired filters, such as genre, release year, rating, etc. Capture the user inputs and incorporate them into the search query for further processing.
  
 - On-the-Fly Integration and Processing: Combine the extracted movie titles from web scraping with the retrieved movie information from the API on the fly. Match the movie titles between the scraped data and API responses to associate the relevant movie details with each title. Perform any necessary data transformations or filtering based on the user's input filters.
@@ -24,17 +22,18 @@
 
 ### Our Project Structure
 1. Scraping
+2. Data Matching
 2. API Integration
 3. On-the-Fly Integration and Processing
 4. Applying Filters and Parameters
 5. Using **Flutter** for web integration
    
-##### For our scraping sources we used the following cinephile(or not) sites:
-- [Library of Congress](https://www.loc.gov/)
-- [IMDB](https://www.imdb.com/)
-- [Criterion Collection](https://www.criterion.com/)
-- [BFI](https://www.bfi.org.uk/)
-- [Rotten Tomatoes](https://www.rottentomatoes.com/)    
+##### For our scraping sources we used the following lists:
+- [Complete National Film Registry from the Library of Congress](https://www.loc.gov/programs/national-film-preservation-board/film-registry/complete-national-film-registry-listing/)
+- [They Shoot Pictures Don't They? annual list of the 1000 greatest films (2023 edition)](https://www.theyshootpictures.com/gf1000_all1000films.htm)
+- [The complete Criterion Collection](https://www.criterion.com/)
+- [Sight and Sound (British Film Intitute's magazine) "The Greatest Films of All Time" list](https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time)
+- [American Film Institute's 100 Years...100 Movies list](https://www.afi.com/afis-100-years-100-movies-10th-anniversary-edition/)
 
 Using basic `BeautifoulSoup` structure
 ```python
@@ -45,53 +44,6 @@ def scrape_movie_titles(url):
     titles = soup.find_all('h2', cdlass_='movie-title')
     movie_titles = [title.text for title in titles]
     return movie_titles
-```
-
-#### Matching Parameters
-Using *Jaccard's* similarity via fuzzy's word token ratio we attempt to eradicate any unwanted duplicate values from our dataset
-
-- Jaccard Similarity for 2 sets:
-  $$J(A, B) = \frac {|A \cap B|}{|A \cup B|}$$
-
-and now for three
-$$d(i,j) = \frac {b+c}{a+b+c} \implies 1- sim(i,j)$$
-
-we exctract the ratio needed to insinuate that the said value is prevalent against the other one.
-
-```python
-import pandas as pd
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
-
-csv_file1 = 'ScrapedCSVs/top_100_movies.csv'
-csv_file2 = 'ScrapeLOC/movies.csv'
-csv_file3 = 'ScrapeRottenTomatoes/moviesRT.csv'
-
-# Read each CSV into separate DataFrames
-df1 = pd.read_csv(csv_file1)
-df2 = pd.read_csv(csv_file2)
-df3 = pd.read_csv(csv_file3)
-
-# Function to find fuzzy matches using Jaccard similarity
-def fuzzy_match_jaccard(movie_title, titles_list):
-    return process.extractOne(movie_title, titles_list, scorer=fuzz.token_sort_ratio)[0]
-
-# Get a list of all movie titles in all three DataFrames
-all_movie_titles = df1['Title'].tolist() + df2['Title'].tolist() + df3['Title'].tolist()
-
-# Find fuzzy matches for each DataFrame
-df1['Matched_Title'] = df1['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
-df2['Matched_Title'] = df2['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
-df3['Matched_Title'] = df3['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
-
-# Concatenate the DataFrames based on fuzzy matches
-combined_df = pd.concat([df1, df2, df3], ignore_index=True)
-
-# Write the combined DataFrame to a new CSV file
-output_csv = 'combined_movies_jaccard.csv'
-combined_df.to_csv(output_csv, index=False)
-
-print(f"Jaccard similarity matching completed. The combined data is saved to {output_csv}.")
 ```
 
 ## Flutter Application
