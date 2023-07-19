@@ -1,7 +1,8 @@
 import requests
 import pandas as pd
-import time
+import os
 
+from dotenv import load_dotenv
 from matching import match
 
 
@@ -10,7 +11,7 @@ def main():
 
     headers = {
         'accept': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmMDIxYjM5MTg4MTBjYmE4NzZmOTNjZmRhNDdjZDM4OSIsInN1YiI6IjYxZjE1MjM2YmUyZDQ5MDExMTY4Y2MxYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.1IuWvGOZvVWpMi0m6yeJTcVcCE6WiokBOG_E5n_ml_M'
+        'Authorization': 'Bearer ' + os.getenv('TMDB_API_ACCESS_TOKEN'),
     }
 
     details = []
