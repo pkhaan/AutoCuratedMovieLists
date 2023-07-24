@@ -1,7 +1,7 @@
 # :camera:Auto Curated Movie Lists 
 ## This projects aims to provide lists containing only *great* movies to users based only a gew filters and search parameters. :cd:
 
-### *Disclaimer*: Everyhting in the Backend folder is working. We still have a problem handling all 5 lists at once. The code that handles all lists exists in*matching.py* but since it doesn't work as expected we also have a function that only compares 2 lists. The output of the matching of the two lists is in *final_movies.csv*. We will update the code when to bug is fixed.
+ *Disclaimer*: Everyhting in the Backend folder is working. We still have a problem handling all 5 lists at once. The code that handles all lists exists in*matching.py* but since it doesn't work as expected we also have a function that only compares 2 lists. The output of the matching of the two lists is in *final_movies.csv*. We will update the code when to bug is fixed.
 
 ### Our Aim
 - Identify Movie Websites: We used websites with lists of "good movies". We chose lists of movies based not on user reviews or personal taste. Most lists come from the opinions of hundreds of film critics around the world and are.
