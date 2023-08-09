@@ -1,8 +1,6 @@
 # :camera:Auto Curated Movie Lists 
 ## This projects aims to provide lists containing only *great* movies to users based only a gew filters and search parameters. :cd:
 
- *Disclaimer*: Everyhting in the Backend folder is working. We still have a problem handling all 5 lists at once. The code that handles all lists exists in*matching.py* but since it doesn't work as expected we also have a function that only compares 2 lists. The output of the matching of the two lists is in *final_movies.csv*. We will update the code when to bug is fixed.
-
 ### Our Aim
 - Identify Movie Websites: We used websites with lists of "good movies". We chose lists of movies based not on user reviews or personal taste. Most lists come from the opinions of hundreds of film critics around the world and are.
  
@@ -50,9 +48,53 @@ def scrape_movie_titles(url):
 ## Data Matching
 For Data Matching we used Python's RecordLinkage library.
 We opted for RecordLinkage instead of a simple concatenation because the titles of the movies aren't always exactly the same across two lists. For example we have "The Godfather" in a list and "The Godfather trilogy" in another, but we only need to keep one.
-RecordLinkage contains various smart indexing and blocking methods and functions to compare records. It uses techniques like Levenshtein distance and Jaccard similarity to compare strings or elements. 
-In our application we iteratively compare all pairs of lists to find movies appearing on both lists. We check that both the titles are similar enough (based on a threshold) and that the years (if available) are the same.
+Record Linkage uses Levenshtein Distance to calculate the similarity between two strings.
+We iteratively compare all pairs of lists to find movies appearing on both lists. We check that both the titles are similar enough (based on a threshold) anf that the years (if available) are the same.
 The output after this step is a sinlge DataFrame containing every movie appearing at least once in some list, without any duplicates. 
+
+
+## Using Jaccard Similarity
+We implement also the matching parameter using `fuzzy` word token ratio and jaccard similarity.
+$$d(i,j) = \frac {b+c}{a+b+c} \implies 1- sim(i,j)$$
+for given sets while the general rule for 2 sets is 
+$$J(A, B) = \frac {|A \cap B|}{|A \cup B|}$$
+
+```python
+import pandas as pd
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
+csv_file1 = 'ScrapedCSVs/top_100_movies.csv'
+csv_file2 = 'ScrapeLOC/movies.csv'
+csv_file3 = 'ScrapeRottenTomatoes/moviesRT.csv'
+
+# Read each CSV into separate DataFrames
+df1 = pd.read_csv(csv_file1)
+df2 = pd.read_csv(csv_file2)
+df3 = pd.read_csv(csv_file3)
+#....and many other .csvs
+
+# Function to find fuzzy matches using Jaccard similarity
+def fuzzy_match_jaccard(movie_title, titles_list):
+    return process.extractOne(movie_title, titles_list, scorer=fuzz.token_sort_ratio)[0]
+
+# Get a list of all movie titles in all three DataFrames
+all_movie_titles = df1['Title'].tolist() + df2['Title'].tolist() + df3['Title'].tolist()
+
+# Find fuzzy matches for each DataFrame
+df1['Matched_Title'] = df1['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
+df2['Matched_Title'] = df2['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
+df3['Matched_Title'] = df3['Title'].apply(fuzzy_match_jaccard, args=(all_movie_titles,))
+
+# Concatenate the DataFrames based on fuzzy matches
+combined_df = pd.concat([df1, df2, df3], ignore_index=True)
+
+# Write the combined DataFrame to a new CSV file
+output_csv = 'combined_movies_jaccard.csv'
+combined_df.to_csv(output_csv, index=False)
+
+print(f"Jaccard similarity matching completed. The combined data is saved to {output_csv}.")
+```
 
 ## Flutter Application
 
@@ -91,8 +133,6 @@ const String themoviedbApi = 'your_api_token_here';
 #### Snapshots
 ![Intro Screen](image.png)
 ![finder](image-1.png)
-![Movie Tags](image-2.png)**`TODO` Migration from android to web seamlessly**
-![web finder](image-3.png)
 
 
 #### Known Bugs`(TODO)`
