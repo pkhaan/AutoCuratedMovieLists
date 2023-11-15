@@ -1,5 +1,5 @@
 # :camera:Auto Curated Movie Lists 
-## This projects aims to provide lists containing only *great* movies to users based only a gew filters and search parameters. :cd:
+## This projects aims to provide lists containing only *great* movies to users based only a few filters and search parameters. :cd:
 
 ### Our Aim
 - Identify Movie Websites: We used websites with lists of "good movies". We chose lists of movies based not on user reviews or personal taste. Most lists come from the opinions of hundreds of film critics around the world and are.
